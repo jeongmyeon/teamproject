@@ -1,23 +1,25 @@
 import { useEffect } from "react";
-import stompClient from "../utils/websocket"; // stompClient 경로에 맞게 조정
+//import stompClient from "../utils/websocket"; // stompClient 경로에 맞게 조정
+import { connectWebSocket, disconnectWebSocket } from "../utils/websocket";
 import { toast } from 'react-toastify';
 
 const ChatNotificationHandler = () => {
   useEffect(() => {
-    if (!stompClient || !stompClient.connected) return;
+    const client = connectWebSocket();
+    if (!client) return;
 
-    const subscription = stompClient.subscribe('/topic/notify/chat', (message) => {
-      const data = JSON.parse(message.body);
-      console.log('📣 채팅 알림 수신:', data);
-
-      // ✅ toast로 알림 표시
-      toast.info(`[채팅 알림] ${data.senderName || '상대방'}: ${data.message}`);
-    });
+    // 연결 성공 시 subscribe
+    client.onConnect = () => {
+      client.subscribe("/topic/notify/chat", (message) => {
+        const data = JSON.parse(message.body);
+        toast.info(`[채팅 알림] ${data.senderName || "상대방"}: ${data.message}`);
+      });
+    };
 
     return () => {
-      subscription.unsubscribe();
+      disconnectWebSocket();
     };
-  }, [stompClient.connected]);
+  }, []);
 
   return null;
 };

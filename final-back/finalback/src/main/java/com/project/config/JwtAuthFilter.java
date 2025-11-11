@@ -35,7 +35,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (requestPath.startsWith("/user/register") || requestPath.startsWith("/user/login") ||
             requestPath.startsWith("/user/verify-email") || requestPath.startsWith("/user/confirm-email") ||
             requestPath.startsWith("/user/check-email") || requestPath.startsWith("/user/find-id") ||
-            requestPath.startsWith("/user/send-verification-code") || requestPath.startsWith("/user/reset-password")) {
+            requestPath.startsWith("/user/send-verification-code") || requestPath.startsWith("/user/reset-password") ||
+        	requestPath.startsWith("/api/weather/recipe") || requestPath.startsWith("/api/weather")){
             chain.doFilter(request, response);
             return;
         }

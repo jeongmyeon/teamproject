@@ -203,6 +203,7 @@ export default function ListDetail(){
       
      const handlePurchase = (ingredientName) =>{
          const searchUrl = `https://www.coupang.com/np/search?q=${encodeURIComponent(ingredientName)}`;
+         
          window.open(searchUrl, '_blank');
      }
      
@@ -370,7 +371,10 @@ export default function ListDetail(){
              {selectRecipes ? (
             <>
                 <div className="recipe-header">
-                    <img src={`http://localhost:8080/uploads/api/userrecipes/${selectRecipes.foodImg}`} alt={selectRecipes.foodName} className="list-img"/>
+                    <img  src={ selectRecipes.foodImg.startsWith("http") 
+                        ? selectRecipes.foodImg  // 외부 URL
+                        : `http://localhost:8080/api/uploads/${encodeURIComponent(selectRecipes.foodImg)}`} 
+                    /*src={`http://localhost:8080/uploads/api/userrecipes/${selectRecipes.foodImg}`}*/ alt={selectRecipes.foodName} className="list-img"/>
                     <h1 className="recipe-detail-name">{selectRecipes.foodName}</h1>
                         <span className="recipetime" style={{color: "#5e5e5e"}}>⏱️ {selectRecipes.foodTime} 분 </span>
                         <span className="recipetime" style={{color: "#5e5e5e"}}>🔖 {selectRecipes.categoryName}</span>
@@ -388,26 +392,36 @@ export default function ListDetail(){
                                         <th></th>
                                     </tr>
                                 </thead>
-                            <tbody>
-                                {selectRecipes.ingredients.map((ingredient, index) => (
-                                    index % 2 === 0 ? (
-                                        <tr key={index}>
-                                            <td className="recipe-detail-in-name">{ingredient.name}</td>
-                                            <td>
-                                                <a onClick={()=>handlePurchase(ingredient.name)}>구매하기</a>
-                                            </td>
-                                {selectRecipes.ingredients[index + 1] && (
-                                        <>
-                                            <td>{selectRecipes.ingredients[index + 1].name}</td>
-                                            <td>
-                                                <a onClick={()=>handlePurchase(ingredient[index+1].name)}>구매하기</a>
-                                            </td>
-                                        </>
-                                )}
-                                        </tr>
-                                                    ) : null 
-                                ))}
-                            </tbody>
+                             <tbody>
+                {selectRecipes.ingredients.map((ingredient, index) => {
+                    // 짝수 인덱스만 새로운 <tr> 생성
+                    if (index % 2 !== 0) return null;
+
+                    const nextIngredient = selectRecipes.ingredients[index + 1];
+
+                    return (
+                        <tr key={index}>
+                            <td className="recipe-detail-in-name">{ingredient.name}</td>
+                            <td>
+                                <a onClick={() => handlePurchase(ingredient.name)}>구매하기</a>
+                            </td>
+                            {nextIngredient ? (
+                                <>
+                                    <td className="recipe-detail-in-name">{nextIngredient.name}</td>
+                                    <td>
+                                        <a onClick={() => handlePurchase(nextIngredient.name)}>구매하기</a>
+                                    </td>
+                                </>
+                            ) : (
+                                <>
+                                    <td></td>
+                                    <td></td>
+                                </>
+                            )}
+                        </tr>
+                    );
+                })}
+            </tbody>
                         </table>
                         ) : (
                             <p>재료 정보가 없습니다.</p>
@@ -419,11 +433,18 @@ export default function ListDetail(){
                 {[1, 2, 3, 4, 5, 6].map((step,index) => {
                             const stepImg = selectRecipes[`stepImg${step}`];
                             const stepText = selectRecipes[`step${step}`];
+                            if(!stepImg && !stepText) return null;
+                            const ImgSrc = stepImg ?
+                                (stepImg.startsWith("http")
+                                    ? stepImg  // 외부 URL
+                                    : `http://localhost:8080/api/uploads/${encodeURIComponent(stepImg)}`) 
+                                : null;
                             return (
                                 stepImg && stepText && (
                                     <div className="recipe-step" key={step}>
                                         <div className="rs-p"> <span className="stepl-index">{index + 1}</span> {stepText}</div>
-                                        <img src={`http://localhost:8080/uploads/api/userrecipes/${stepImg}`} alt={`Step ${step} image for ${selectRecipes.foodName}`} />
+                                        <img src={ ImgSrc }
+                                        /*src={`http://localhost:8080/uploads/api/userrecipes/${stepImg}`}*/ alt={`Step ${step} image for ${selectRecipes.foodName}`} />
                                     </div>
                                 )
                             );
@@ -535,7 +556,11 @@ export default function ListDetail(){
                     {filteredRecipes.map((recipe) => (
                         <div key={recipe.recipesId} className="recipes-card">
                             <Link to={`/list/${recipe.recipesId}`} onClick={() => handleClick(recipe.recipesId)}>
-                                <img className="rc-img" src={`http://localhost:8080/uploads/api/userrecipes/${recipe.foodImg}`} alt={recipe.foodName} />
+                                <img className="rc-img" 
+                                src={ recipe.foodImg.startsWith("http") 
+                        ? recipe.foodImg  // 외부 URL
+                        : `http://localhost:8080/api/uploads/${encodeURIComponent(recipe.foodImg)}`} 
+                                /*src={`http://localhost:8080/uploads/api/userrecipes/${recipe.foodImg}`}*/ alt={recipe.foodName} />
                             </Link>  
                             <h3 className="rd-reco">{recipe.foodName}</h3>
                             <div className="recipes-grid-btn">

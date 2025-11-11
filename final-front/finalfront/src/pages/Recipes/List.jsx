@@ -279,7 +279,11 @@ export default function List() {
                     {recipes.slice(0, visibleCount).map((recipe) => (
                         <div key={recipe.recipesId} className="recipes-card">
                             <Link to={`/list/${recipe.recipesId}`} onClick={() => handleClick(recipe.recipesId)}>
-                                <img className="rc-list-img" src={`http://localhost:8080/uploads/api/userrecipes/${recipe.foodImg}`} alt={recipe.foodName} />
+                                <img className="rc-list-img" 
+                                src={ recipes.foodImg.startsWith("http") 
+                        ? recipes.foodImg  // 외부 URL
+                        : `http://localhost:8080/api/uploads/${encodeURIComponent(recipes.foodImg)}`} 
+                                /*src={`http://localhost:8080/uploads/api/userrecipes/${recipe.foodImg}`}*/ alt={recipe.foodName} />
                             </Link>  
                             <h3 className="rc-fn">{recipe.foodName}</h3>
                             <div className="recipes-grid-btn" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>

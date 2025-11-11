@@ -20,7 +20,7 @@ const AdminNotificationForm = () => {
       const base64Url = token?.split(".")[1];
       const decodedPayload = JSON.parse(atob(base64Url));
       console.log("📌 디코드된 JWT Payload:", decodedPayload);
-    } catch (err) {
+    } catch (error) {
       console.warn("⚠️ JWT 디코딩 실패: 토큰 형식 확인 필요");
     }
 

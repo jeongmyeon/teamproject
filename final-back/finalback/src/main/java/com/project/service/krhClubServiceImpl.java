@@ -60,7 +60,7 @@ public class krhClubServiceImpl implements krhClubService{
 	        // 해시태그가 있을 경우 처리
 	        if (krhclubVO.getHashtags() != null && !krhclubVO.getHashtags().isEmpty()) {
 	            // 태그 삽입 (중복 방지)
-	            krhclubMapper.insertTagIfNotExist(krhclubVO);
+	            krhclubMapper.insertTagIfNotExist(krhclubVO.getHashtags());
 
 	            // 클럽과 태그 연결
 	            krhclubMapper.linkPostHashtags(krhclubVO.getClubId(), krhclubVO.getHashtags());

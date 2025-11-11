@@ -1,6 +1,6 @@
 package com.project.mapper;
 
-import com.project.model.Recipe;
+import com.project.model.Recipe; 
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;

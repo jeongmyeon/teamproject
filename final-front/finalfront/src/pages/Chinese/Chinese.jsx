@@ -276,7 +276,11 @@ export default function Chinese(){
                     className="recipes-card"
                     >
                         <Link to={`/list/${recipe.recipesId}`} onClick={()=>handleClick(recipe.recipesId)}>
-                        <img  className="rc-list-img" src={`http://localhost:8080/uploads/api/userrecipes/${recipe.foodImg}`} alt={recipe.foodName}/>
+                        <img  className="rc-list-img" 
+                        src={ recipe.foodImg.startsWith("http") 
+                        ? recipe.foodImg  // 외부 URL
+                        : `http://localhost:8080/api/uploads/${encodeURIComponent(recipe.foodImg)}`} 
+                        /*src={`http://localhost:8080/uploads/api/userrecipes/${recipe.foodImg}`}*/ alt={recipe.foodName}/>
                         </Link>  
                         <h3 className="rc-fn">{recipe.foodName}</h3>
                         <div className="recipes-grid-btn" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
