@@ -280,9 +280,9 @@ export default function List() {
                         <div key={recipe.recipesId} className="recipes-card">
                             <Link to={`/list/${recipe.recipesId}`} onClick={() => handleClick(recipe.recipesId)}>
                                 <img className="rc-list-img" 
-                                src={ recipes.foodImg.startsWith("http") 
-                        ? recipes.foodImg  // 외부 URL
-                        : `http://localhost:8080/api/uploads/${encodeURIComponent(recipes.foodImg)}`} 
+                                src={ recipe.foodImg.startsWith("http") 
+                        ? recipe.foodImg  // 외부 URL
+                        : `http://localhost:8080/api/uploads/${encodeURIComponent(recipe.foodImg)}`} 
                                 /*src={`http://localhost:8080/uploads/api/userrecipes/${recipe.foodImg}`}*/ alt={recipe.foodName} />
                             </Link>  
                             <h3 className="rc-fn">{recipe.foodName}</h3>
