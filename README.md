@@ -4,7 +4,7 @@
 ## Tech Stack ##
 - Java / Spring Boot / React / MySQL
 - ERD
-  <img width="4850" height="2472" alt="FinalProject" src="https://github.com/user-attachments/assets/c9695a53-ec25-49b0-b72e-bc3c4b084374" />
+  <img width="4000" height="2472" alt="FinalProject" src="https://github.com/user-attachments/assets/c9695a53-ec25-49b0-b72e-bc3c4b084374" />
   
 
 ## 주요 역할 ##
@@ -26,5 +26,3 @@
 - 원인 분석 : 브라우저 개발자 도구 분석 결과, useEffect 훅의 의존성 배열 설정 마비로 인해 컴포넌트 리렌더링 시마다 API 요청 함수가 재실행되는 구조임을 파악.
 - 해결 : useEffect 내 의존성 배열을 정확히 설정하여 초기 렌더링 시 단 1회만 호출되도록 로직 수정.
 - 성과 : API 호출 횟수 감소 및 서버 자원 낭비 방지. 페이지 로딩 속도 개선
-
-## ERD ## 
