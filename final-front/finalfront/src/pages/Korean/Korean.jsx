@@ -31,55 +31,81 @@ export default function Korean(){
     useEffect(() => {
         const token = localStorage.getItem('token');
         setToken(token);
-        
-    
-        // 유효하지 않은 토큰 처리 (예: 만료된 토큰)
-        if (token) {
-            axios.get(`http://localhost:8080/api/recipes`)
-                .then(response => {
-                    setFilteredRecipes(response.data);
-                })
-                .catch(error => {
-                    console.log("데이터를 불러오는 중 오류 발생:", error);
-                    alert("토큰이 만료되었거나 유효하지 않습니다.");
-                    localStorage.removeItem('token');
-                    setToken(null);  // 토큰 상태 초기화
-                });
-                axios.get(`http://localhost:8080/api/recipes/favorites`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                })
-                .then(response => {
-                    const favoritesData = response.data.favorites;  // response.data.favorites 확인
-                    const favoritesObj = {};
-                    favoritesData.forEach(recipe => {
-                        favoritesObj[recipe.recipesId] = true;
-                    });
-                    setFavorites(favoritesObj);
-                })
-                .catch(error => {
-                    console.log("즐겨찾기 정보를 불러오는 중 오류 발생:", error);
-                    alert("즐겨찾기 정보를 불러오는 데 실패했습니다.");
-                });
-            } else {
-                // 토큰이 없으면 즐겨찾기 정보를 초기화
-                setFavorites({});
-            }
-    }, []);
 
-    useEffect(() => {
-        const fetchRecipes = () => {
-            axios.get('http://localhost:8080/api/recipes') 
-                .then(response => {
-                    console.log(response.data);
-                    const koreanRecipes = response.data.filter(recipe => recipe.categoryName === '한식'); 
-                    setFilteredRecipes(koreanRecipes);
-                })
-                .catch(error => {
-                    console.error("데이터를 불러오는 중 오류 발생:", error);
-                });
+        const fetchRecipes = async() => {
+            try{
+                const response = await axios.get(`http://localhost:8080/api/recipes`);
+                const koreanRecipes = response.data.filter(recipe => recipe.categoryName === '한식');
+                setFilteredRecipes(koreanRecipes);
+                
+                if(token){
+                    const favResponse = await axios.get(`http://localhost:8080/api/recipes/favorites`,{
+                        headers: {'Authorization': `Bearer ${token}`}
+                    });
+                    const favoritesData = {};
+                    favResponse.data.favorites.forEach(recipe => {
+                        favoritesData[recipe.recipesId] = true;
+                    });
+                    setFavorites(favoritesData);
+                }
+            }catch(error){
+                console.log("데이터 로딩 중 오류:", error);
+            }
         };
         fetchRecipes();
-    }, []);
+    },[]);
+    // useEffect(() => {
+    //     const token = localStorage.getItem('token');
+    //     setToken(token);
+        
+    
+    //     // 유효하지 않은 토큰 처리 (예: 만료된 토큰)
+    //     if (token) {
+    //         axios.get(`http://localhost:8080/api/recipes`)
+    //             .then(response => {
+    //                 setFilteredRecipes(response.data);
+    //             })
+    //             .catch(error => {
+    //                 console.log("데이터를 불러오는 중 오류 발생:", error);
+    //                 alert("토큰이 만료되었거나 유효하지 않습니다.");
+    //                 localStorage.removeItem('token');
+    //                 setToken(null);  // 토큰 상태 초기화
+    //             });
+    //             axios.get(`http://localhost:8080/api/recipes/favorites`, {
+    //                 headers: { 'Authorization': `Bearer ${token}` }
+    //             })
+    //             .then(response => {
+    //                 const favoritesData = response.data.favorites;  // response.data.favorites 확인
+    //                 const favoritesObj = {};
+    //                 favoritesData.forEach(recipe => {
+    //                     favoritesObj[recipe.recipesId] = true;
+    //                 });
+    //                 setFavorites(favoritesObj);
+    //             })
+    //             .catch(error => {
+    //                 console.log("즐겨찾기 정보를 불러오는 중 오류 발생:", error);
+    //                 alert("즐겨찾기 정보를 불러오는 데 실패했습니다.");
+    //             });
+    //         } else {
+    //             // 토큰이 없으면 즐겨찾기 정보를 초기화
+    //             setFavorites({});
+    //         }
+    // }, []);
+
+    // useEffect(() => {
+    //     const fetchRecipes = () => {
+    //         axios.get('http://localhost:8080/api/recipes') 
+    //             .then(response => {
+    //                 console.log(response.data);
+    //                 const koreanRecipes = response.data.filter(recipe => recipe.categoryName === '한식'); 
+    //                 setFilteredRecipes(koreanRecipes);
+    //             })
+    //             .catch(error => {
+    //                 console.error("데이터를 불러오는 중 오류 발생:", error);
+    //             });
+    //     };
+    //     fetchRecipes();
+    // }, []);
 
     
 
@@ -123,7 +149,7 @@ export default function Korean(){
         if (query.trim()) {
             handleSearch(); // query가 업데이트된 후에 검색이 실행되도록
         }
-    }, [query]); // query가 변경될 때마다 실행
+    }, []); // query가 변경될 때마다 실행
 
     const handleSearch = () => {
         if (!category) {
@@ -233,18 +259,23 @@ export default function Korean(){
 
     useEffect(() => {
         const fetchAllComments = async () => {
+            if(filteredRecipes.length === 0) return;
+            console.log("데이터 로딩 시작: ", filteredRecipes);
+
+            const promises = filteredRecipes.map(async (recipe) => {
+                const count = await fetchCommentCount(recipe.recipesId);
+                return { id : recipe.recipesId, count};
+            });
+            const results = await Promise.all(promises);
             const counts = {};
-            for (const recipe of recipes) {
-                counts[recipe.recipesId] = await fetchCommentCount(recipe.recipesId);
-            }
-            console.log("댓글 데이터:", counts); 
+            results.forEach( response => {
+                counts[response.id] = response.count;
+            });
+            console.log("최종 댓글 데이터: ", counts);
             setCommentCounts(counts);
         };
-    
-        if (recipes.length > 0) {
-            fetchAllComments();
-        }
-    }, [recipes]);
+        fetchAllComments();
+    }, [filteredRecipes]);
 
     return (
         <div className="recipes-main">

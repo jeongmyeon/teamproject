@@ -23,7 +23,7 @@ const Sidebar = () => {
           </li>
           <li className="">
             <Link to="/japanese" className={location.pathname === "/japanese" ? "active" : ""}  
-            onClick={() => handleLinkClick("/japanes")}>일식</Link>
+            onClick={() => handleLinkClick("/japanese")}>일식</Link>
           </li>
           <li className="">
             <Link to="/chinese" className={location.pathname === "/chinese" ? "active" : ""}  

@@ -24,39 +24,92 @@ export default function ListDetail(){
         const token = localStorage.getItem('token');
         setToken(token);
         
-        
-        // 유효하지 않은 토큰 처리 (예: 만료된 토큰)
-        if (token) {
-            axios.get(`http://localhost:8080/api/recipes`)
-                .then(response => {
-                    setRecipes(response.data);
-                })
-                .catch(error => {
-                    console.log("데이터를 불러오는 중 오류 발생:", error);
-                    alert("토큰이 만료되었거나 유효하지 않습니다.");
-                    localStorage.removeItem('token');
-                    setToken(null);  // 토큰 상태 초기화
-                });
-                axios.get(`http://localhost:8080/api/recipes/favorites`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                })
-                .then(response => {
-                    const favoritesData = response.data.favorites;  // response.data.favorites 확인
+        const fetchData = async() => {
+            try{
+                const recipesResponse = await axios.get(`http://localhost:8080/api/recipes`);
+                setRecipes(recipesResponse.data);
+
+                if(token){
+                    const favoritesResponse = await axios.get(`http://localhost:8080/api/recipes/favorites`, {
+                        headers: { 'Authorization' : `Bearer ${token}` }
+                    });
+                    const favoritesData = favoritesResponse.data.favorites;
                     const favoritesObj = {};
                     favoritesData.forEach(recipe => {
                         favoritesObj[recipe.recipesId] = true;
                     });
                     setFavorites(favoritesObj);
-                })
-                .catch(error => {
-                    console.log("즐겨찾기 정보를 불러오는 중 오류 발생:", error);
-                    alert("즐겨찾기 정보를 불러오는 데 실패했습니다.");
-                });
-            } else {
-                // 토큰이 없으면 즐겨찾기 정보를 초기화
-                setFavorites({});
+                    }
+                }catch (error){
+                    console.log("조기 로딩 중 오류:", error);
+                    if (error.response?.statues === 401){
+                        localStorage.removeItem('token');
+                        setToken(null);
+                    }
+                }
+            };
+            fetchData();
+        },[]);
+        
+        // // 유효하지 않은 토큰 처리 (예: 만료된 토큰)
+        // if (token) {
+        //     axios.get(`http://localhost:8080/api/recipes`)
+        //         .then(response => {
+        //             setRecipes(response.data);
+        //         })
+        //         .catch(error => {
+        //             console.log("데이터를 불러오는 중 오류 발생:", error);
+        //             alert("토큰이 만료되었거나 유효하지 않습니다.");
+        //             localStorage.removeItem('token');
+        //             setToken(null);  // 토큰 상태 초기화
+        //         });
+        //         axios.get(`http://localhost:8080/api/recipes/favorites`, {
+        //             headers: { 'Authorization': `Bearer ${token}` }
+        //         })
+        //         .then(response => {
+        //             const favoritesData = response.data.favorites;  // response.data.favorites 확인
+        //             const favoritesObj = {};
+        //             favoritesData.forEach(recipe => {
+        //                 favoritesObj[recipe.recipesId] = true;
+        //             });
+        //             setFavorites(favoritesObj);
+        //         })
+        //         .catch(error => {
+        //             console.log("즐겨찾기 정보를 불러오는 중 오류 발생:", error);
+        //             alert("즐겨찾기 정보를 불러오는 데 실패했습니다.");
+        //         });
+        //     } else {
+        //         // 토큰이 없으면 즐겨찾기 정보를 초기화
+        //         setFavorites({});
+        //     }
+
+        useEffect(() => {
+            const fetchDetailData = async() => {
+                if(!id) return;
+                try{
+                    const detailResponse = await axios.get(`http://localhost:8080/api/recipes/${id}`);
+                    setSelectRecipes(detailResponse.data);
+                    
+                    const reviewResponse = await axios.get(`http://localhost:8080/api/recipes/review/${id}`);
+                    setReview(reviewResponse.data);
+                    
+                    const counterResponse = await axios.get(`http://localhost:8080/api/recipe/review/count/${id}`);
+                    setCommentCounts(prev => ({ ...prev, [id]: counterResponse.data.count }));
+                }catch(error){
+                    console.log("상세 정보 로드 오류:", error);
+                }
+            };
+            fetchDetailData();
+        },[id]);
+
+        useEffect(() => {
+            if(recipes.length > 0 && selectRecipes){
+                const relatedRecipes = recipes
+                .filter(recipe => recipe.categoryName === selectRecipes.categoryName && recipe.recipesId !== selectRecipes.recipesId)
+                .sort(() => Math.random() - 0.5);
+                setFilteredRecipes(relatedRecipes); 
             }
-        }, []);
+        },[recipes,selectRecipes]);
 
         const handleFavorite = (recipesId) => {
             if (!token) {
@@ -88,23 +141,23 @@ export default function ListDetail(){
                 });
         }
 
-    useEffect(()=>{
-        const token = localStorage.getItem('token');
-        setToken(token);
+    // useEffect(()=>{
+    //     const token = localStorage.getItem('token');
+    //     setToken(token);
         
 
-        if(token){
-            axios.get(`http://localhost:8080/api/recipes`)
-            .then(response=>{
-                setRecipes(response.data);
-            })
-            .catch(error =>{
-                console.log("오류",error);
-                localStorage.removeItem('token');
-                setToken(null);
-            });
-        }
-    },[])
+    //     if(token){
+    //         axios.get(`http://localhost:8080/api/recipes`)
+    //         .then(response=>{
+    //             setRecipes(response.data);
+    //         })
+    //         .catch(error =>{
+    //             console.log("오류",error);
+    //             localStorage.removeItem('token');
+    //             setToken(null);
+    //         });
+    //     }
+    // },[])
     
    
   //top으로 이동
@@ -113,18 +166,18 @@ export default function ListDetail(){
   };
 
   
-    useEffect(() => {
-        const fetchRecipes = () => {
-            axios.get('http://localhost:8080/api/recipes') 
-                .then(response => {
-                    setRecipes(response.data); 
-                })
-                .catch(error => {
-                    console.error("데이터를 불러오는 중 오류 발생:", error);
-                });
-        };
-        fetchRecipes();
-    }, []);
+    // useEffect(() => {
+    //     const fetchRecipes = () => {
+    //         axios.get('http://localhost:8080/api/recipes') 
+    //             .then(response => {
+    //                 setRecipes(response.data); 
+    //             })
+    //             .catch(error => {
+    //                 console.error("데이터를 불러오는 중 오류 발생:", error);
+    //             });
+    //     };
+    //     fetchRecipes();
+    // }, []);
 
     const handleClick = (recipesId) => {
     
@@ -143,26 +196,26 @@ export default function ListDetail(){
         });
     };
 
-    useEffect(() => {
-        const fetchRecipesDetail = () => {
-            axios.get(`http://localhost:8080/api/recipes/${id}`)
-                .then(response => {
-                    setSelectRecipes(response.data);
+    // useEffect(() => {
+    //     const fetchRecipesDetail = () => {
+    //         axios.get(`http://localhost:8080/api/recipes/${id}`)
+    //             .then(response => {
+    //                 setSelectRecipes(response.data);
 
-                    if (response.data) {
-                        const relatedRecipes = recipes
-                            .filter(recipe => recipe.categoryName === response.data.categoryName && recipe.recipesId !== response.data.recipesId)
-                            .sort(() => Math.random() - 0.5);
-                        setFilteredRecipes(relatedRecipes);
-                    }
-                })
-                .catch(error => {
-                    console.error("데이터를 불러오는 중 오류 발생:", error);
-                });
-        };
+    //                 if (response.data) {
+    //                     const relatedRecipes = recipes
+    //                         .filter(recipe => recipe.categoryName === response.data.categoryName && recipe.recipesId !== response.data.recipesId)
+    //                         .sort(() => Math.random() - 0.5);
+    //                     setFilteredRecipes(relatedRecipes);
+    //                 }
+    //             })
+    //             .catch(error => {
+    //                 console.error("데이터를 불러오는 중 오류 발생:", error);
+    //             });
+    //     };
 
-        fetchRecipesDetail();
-    }, [id, recipes]);
+    //     fetchRecipesDetail();
+    // }, [id, recipes]);
 
     const getStars = (rating) => {
         // 별을 gold 이모지로 처리, 빈 별은 gray로 처리
@@ -212,19 +265,19 @@ export default function ListDetail(){
         };
 
 
-        useEffect(()=>{
-            axios.get(`http://localhost:8080/api/recipes/review/${id}`)
-            .then(response =>{
-                setReview(response.data);
-            })
-            .catch(error=>{
-                console.error("데이터를 불러오는 중 오류 발생:", error);
-            })
+        // useEffect(()=>{
+        //     axios.get(`http://localhost:8080/api/recipes/review/${id}`)
+        //     .then(response =>{
+        //         setReview(response.data);
+        //     })
+        //     .catch(error=>{
+        //         console.error("데이터를 불러오는 중 오류 발생:", error);
+        //     })
             
-        },[id])
+        // },[id])
     
-    const handleReviewSubmit = () => {
-        
+    const handleReviewSubmit = (e) => {
+        if(e) e.preventDefault();
         if (!token) {
             alert("로그인이 필요합니다.");
             return;

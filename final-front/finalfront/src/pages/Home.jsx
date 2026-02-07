@@ -258,17 +258,22 @@ export default function Home() {
 
     useEffect(() => {
         const fetchAllComments = async () => {
+            if(recipes.length === 0) return;
+            console.log("데이터 로딩 시작: ", recipes);
+
+            const promises = recipes.map(async (recipe) => {
+                const count = await fetchCommentCount(recipe.recipesId);
+                return { id : recipe.recipesId, count};
+            });
+            const results = await Promise.all(promises);
             const counts = {};
-            for (const recipe of recipes) {
-                counts[recipe.recipesId] = await fetchCommentCount(recipe.recipesId);
-            }
-            console.log("댓글 데이터:", counts); 
+            results.forEach( response => {
+                counts[response.id] = response.count;
+            });
+            console.log("최종 댓글 데이터: ", counts);
             setCommentCounts(counts);
         };
-    
-        if (recipes.length > 0) {
-            fetchAllComments();
-        }
+        fetchAllComments();
     }, [recipes]);
   return (
     <div className="home">

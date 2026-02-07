@@ -106,14 +106,14 @@ export default function Header({ isLoggedIn, setIsLoggedIn }) {
                 한식
               </Link>
               <Link
-                to={"/Chinese"}
-                className={location.pathname === "/Chinese" ? "active" : ""}
+                to={"/Japanese"}
+                className={location.pathname === "/Japanese" ? "active" : ""}
               >
                 일식
               </Link>
               <Link
-                to={"/Japanese"}
-                className={location.pathname === "/Japanese" ? "active" : ""}
+                to={"/Chinese"}
+                className={location.pathname === "/Chinese" ? "active" : ""}
               >
                 중식
               </Link>
