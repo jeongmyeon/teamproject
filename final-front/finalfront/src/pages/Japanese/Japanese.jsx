@@ -331,6 +331,7 @@ export default function Japanese(){
                     더보기
                 </button>
             )}
+             <button onClick={scrollToTop} className="totop">🔝</button>
         </div>
     );
 }

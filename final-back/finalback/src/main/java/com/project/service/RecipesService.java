@@ -1,6 +1,6 @@
 package com.project.service;
 
-import java.util.List;  
+import java.util.List;    
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,97 +12,178 @@ import com.project.model.Ingredients;
 import com.project.model.Recipes;
 import com.project.model.User;
 import com.project.model.UserRecipe;
+import com.project.repository.RecipesRepository;
 
 @Service
 public class RecipesService {
-	
 	@Autowired
-	private RecipesMapper recipesMapper;
+	private RecipesRepository recipesRepository;
+	
 	@Autowired
 	private UserService userService;
 	
+	// 1. 전체 레시피
 	public List<Recipes> getAllRecipes(){
-		List<Recipes> recipes = recipesMapper.getAllRecipes();
-		System.out.println("기본");
-		return recipes;
+		return recipesRepository.findAllWithIngredients();
 	}
 	
+	// 2. 인기 레시피
 	public List<Recipes> getPopularRecipes(){
-		List<Recipes> recipes = recipesMapper.getPopularRecipes();
-		return recipes;
+		return recipesRepository.findTop10ByOrderByViewDesc();
 	}
 	
-	public Recipes recipeById(long recipesId) {
-		Recipes recipe = recipesMapper.findById(recipesId);
-		if (recipe == null) {
-			throw new RuntimeException("레시피를 찾을 수 없습니다: " + recipesId);
-		}
-		return recipe;
+	// 3. ID 상세조회
+	public Recipes recipesById(Integer recipesId) {
+		return recipesRepository.findById(recipesId)
+				.orElseThrow(() -> new RuntimeException("레시피를 찾을 수 없습니다: "+ recipesId));
 	}
 	
-	public Recipes findById(long recipesId) {
-		Recipes recipe = recipesMapper.findById(recipesId);
-		if(recipe == null) {
-			throw new RuntimeException("레시피를 찾을 수 없음");
-		}
-		return recipe;
+	// 4. 조회수 증가
+	@Transactional
+	public void updateViewCount(Integer recipesId) {
+		Recipes recipe = recipesRepository.findById(recipesId)
+				.orElseThrow(() -> new RuntimeException("레시피 없음"));
+		recipe.setView(recipe.getView() + 1);
 	}
 	
-	 public Recipes findByRecipeId(long recipeId) {
-	        return recipesMapper.findByRecipeId(recipeId);
-	    }
-
-	
-	public List<Ingredients> getIngredientsByRecipeId(long recipesId) {
-		 List<Ingredients> ingredients = recipesMapper.findIngredientsByRecipeId(recipesId);
-		    
-		    return ingredients;
+	// 5. 음식명 검색
+	public List<Recipes> findByFoodName(String query){
+		return recipesRepository.findByFoodNameContaining(query);
 	}
 	
-	 public void update(Recipes recipe) {
-	        
-		 recipesMapper.incrementViewCount(recipe.getRecipesId());
-	    }
+	// 6. 재료로 레시피 검색
+	public List<Recipes> findByIngredient(String query){
+		return recipesRepository.findByIngredientsNameContaining(query);
+	}
 	
+	// 7. 카테고리 조회
+	public List<Recipes> getRecipesByCategory(Integer categoryId){
+		return recipesRepository.findByCategory_CategoryId(categoryId);
+	}
+	
+	// 8. 날씨 기반 추천
+	public List<Recipes> getWeatherRecipes(int weatherId){
+		return recipesRepository.findByWeatherId(weatherId);
+	}
+	
+	@Autowired
+	private RecipesMapper recipesMapper;
 	 public void addFavorite(Recipes recipe, String email) {
-		    User user = userService.getUserByEmail(email); // 사용자 정보 가져오기
-		    if (user != null) {
-		        recipesMapper.addFavoriteList(recipe.getRecipesId(), user.getId());
-		    } else {
-		        throw new RuntimeException("사용자를 찾을 수 없습니다.");
-		    }
-		}
-	
+		 User user = userService.getUserByEmail(email); // 사용자 정보 가져오기
+    	if (user != null) {
+        	recipesMapper.addFavoriteList(recipe.getRecipesId(), user.getId());
+    	} else {
+        	throw new RuntimeException("사용자를 찾을 수 없습니다.");
+    	}
+	 }
+
 	 @Transactional
-	public void deleteFavorite(Recipes recipe, String email) {
+	 public void deleteFavorite(Recipes recipe, String email) {
 		 User user = userService.getUserByEmail(email);
 		 if(user != null) {
 			 long userId = user.getId();  
-		     long recipeId = recipe.getRecipesId();  
+			 long recipeId = recipe.getRecipesId();  
 
-		     recipesMapper.deleteFavoriteList(userId, recipeId);
+			 recipesMapper.deleteFavoriteList(userId, recipeId);
 		 }
-	}
-	
-	public List<Recipes> findByFoodName(String query){
-		return recipesMapper.findByFoodName(query);
-	}
-	
-	public List<Recipes> findByIngredient(String query){
-		return recipesMapper.findByIngredient(query);
-	}
-	
-	public List<Recipes> getFavoritesByUserId(Long userId) {
-	    return recipesMapper.getFavoritesByUserId(userId);
-	}
-	
-	public List<Recipes> getWeatherRecipes(String precipitation){
-    	List<Recipes> recipes = recipesMapper.getWeatherRecipes(precipitation);
-    	return recipes;
-    }
-	
+	 }
 
-	
+	 public List<Recipes> getFavoritesByUserId(Long userId) {
+		 return recipesMapper.getFavoritesByUserId(userId);
+	 }
+	 
+	public List<Ingredients> getIngredientsByRecipeId(Integer recipesId) {
+		List<Ingredients> ingredients = recipesMapper.findIngredientsByRecipeId(recipesId);
+	    
+	    return ingredients;
+	}
+//	@Autowired
+//	private RecipesMapper recipesMapper;
+//	@Autowired
+//	private UserService userService;
+//	
+//	public List<Recipes> getAllRecipes(){
+//		List<Recipes> recipes = recipesMapper.getAllRecipes();
+//		System.out.println("기본");
+//		return recipes;
+//	}
+//	
+//	public List<Recipes> getPopularRecipes(){
+//		List<Recipes> recipes = recipesMapper.getPopularRecipes();
+//		return recipes;
+//	}
+//	
+//	public Recipes recipeById(long recipesId) {
+//		Recipes recipe = recipesMapper.findById(recipesId);
+//		if (recipe == null) {
+//			throw new RuntimeException("레시피를 찾을 수 없습니다: " + recipesId);
+//		}
+//		return recipe;
+//	}
+//	
+//	public Recipes findById(long recipesId) {
+//		Recipes recipe = recipesMapper.findById(recipesId);
+//		if(recipe == null) {
+//			throw new RuntimeException("레시피를 찾을 수 없음");
+//		}
+//		return recipe;
+//	}
+//	
+//	 public Recipes findByRecipeId(long recipeId) {
+//	        return recipesMapper.findByRecipeId(recipeId);
+//	    }
+//
+//	
+//	public List<Ingredients> getIngredientsByRecipeId(long recipesId) {
+//		 List<Ingredients> ingredients = recipesMapper.findIngredientsByRecipeId(recipesId);
+//		    
+//		    return ingredients;
+//	}
+//	
+//	 public void update(Recipes recipe) {
+//	        
+//		 recipesMapper.incrementViewCount(recipe.getRecipesId());
+//	    }
+//	
+//	 public void addFavorite(Recipes recipe, String email) {
+//		    User user = userService.getUserByEmail(email); // 사용자 정보 가져오기
+//		    if (user != null) {
+//		        recipesMapper.addFavoriteList(recipe.getRecipesId(), user.getId());
+//		    } else {
+//		        throw new RuntimeException("사용자를 찾을 수 없습니다.");
+//		    }
+//		}
+//	
+//	 @Transactional
+//	public void deleteFavorite(Recipes recipe, String email) {
+//		 User user = userService.getUserByEmail(email);
+//		 if(user != null) {
+//			 long userId = user.getId();  
+//		     long recipeId = recipe.getRecipesId();  
+//
+//		     recipesMapper.deleteFavoriteList(userId, recipeId);
+//		 }
+//	}
+//	
+//	public List<Recipes> findByFoodName(String query){
+//		return recipesMapper.findByFoodName(query);
+//	}
+//	
+//	public List<Recipes> findByIngredient(String query){
+//		return recipesMapper.findByIngredient(query);
+//	}
+//	
+//	public List<Recipes> getFavoritesByUserId(Long userId) {
+//	    return recipesMapper.getFavoritesByUserId(userId);
+//	}
+//	
+//	public List<Recipes> getWeatherRecipes(String precipitation){
+//    	List<Recipes> recipes = recipesMapper.getWeatherRecipes(precipitation);
+//    	return recipes;
+//    }
+//	
+//
+//	
 	
 }
 

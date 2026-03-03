@@ -1,6 +1,6 @@
 package com.project.controller;
 
-import java.util.ArrayList;
+import java.util.ArrayList; 
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.model.Ingredient;
+import com.project.model.Ingredients;
 import com.project.model.Inquiry;
 import com.project.model.Recipe;
 import com.project.model.User;
@@ -146,13 +146,13 @@ public class AdminController {
     
     /** ✅ 2. 특정 레시피 조회 (레시피 + 재료 목록 포함) */
     @GetMapping("/recipes/{recipeId}")
-    public ResponseEntity<Recipe> getRecipeById(@PathVariable Long recipeId) {
+    public ResponseEntity<Recipe> getRecipeById(@PathVariable Integer recipeId) {
         return ResponseEntity.ok(adminService.getRecipeById(recipeId));
     }
 
     /** ✅ 3. 특정 레시피의 재료 목록 조회 */
     @GetMapping("/recipes/{recipeId}/ingredients")
-    public ResponseEntity<List<Ingredient>> getIngredientsByRecipeId(@PathVariable Long recipeId) {
+    public ResponseEntity<List<Ingredients>> getIngredientsByRecipeId(@PathVariable Integer recipeId) {
         return ResponseEntity.ok(adminService.getIngredientsByRecipeId(recipeId));
     }
 
@@ -200,7 +200,7 @@ public class AdminController {
     /** ✅ 5. 레시피 수정 */
     @PutMapping("/recipes/{recipeId}")
     public ResponseEntity<String> updateRecipe(
-            @PathVariable Long recipeId,
+            @PathVariable Integer recipeId,
             @RequestParam("foodName") String foodName,
             @RequestParam("foodTime") int foodTime,
             @RequestParam("categoryId") int categoryId,
@@ -265,14 +265,14 @@ public class AdminController {
 
     /** ✅ 6. 레시피 삭제 */
     @DeleteMapping("/recipes/{recipeId}")
-    public ResponseEntity<String> deleteRecipe(@PathVariable Long recipeId) {
+    public ResponseEntity<String> deleteRecipe(@PathVariable Integer recipeId) {
         adminService.deleteRecipe(recipeId);
         return ResponseEntity.ok("레시피 삭제 완료!");
     }
 
   
     @DeleteMapping("/recipes/{recipeId}/step-img/{stepNumber}")
-    public ResponseEntity<?> deleteStepImage(@PathVariable Long recipeId, @PathVariable int stepNumber) {
+    public ResponseEntity<?> deleteStepImage(@PathVariable Integer recipeId, @PathVariable int stepNumber) {
         try {
             adminService.deleteStepImage(recipeId, stepNumber);
             return ResponseEntity.ok().body("✅ 단계 " + stepNumber + " 이미지 삭제 성공");

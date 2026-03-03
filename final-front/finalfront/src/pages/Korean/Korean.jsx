@@ -23,8 +23,8 @@ export default function Korean(){
 
           //top으로 이동
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      };
     const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
     recognition.lang = 'ko-KR';
     
@@ -334,6 +334,7 @@ export default function Korean(){
                     더보기
                 </button>
             )}
+             <button onClick={scrollToTop} className="totop">🔝</button>
         </div>
     );
 }

@@ -169,6 +169,7 @@ export default function Popular() {
                     더보기
                 </button>
             )}
+            <button onClick={scrollToTop} className="totop">🔝</button>
         </div>
     );
 }

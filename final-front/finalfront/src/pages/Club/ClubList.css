@@ -60,22 +60,6 @@
   background-color: #ff9d68;
 }
 
-/* 위로 가는 버튼 */
-.totop {
-  position: fixed !important;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: #FFA575;
-  color: #fff;
-  padding: 10px;
-  border-radius: 80px;
-  border: none;
-  cursor: pointer;
-  z-index: 1000;
-  font-size: 40px;
-  transition: transform 0.3s, font-size 0.3s;
-}
 
 .totop:hover {
   transform: translateY(-50%) scale(1.1);

@@ -145,6 +145,24 @@
     background-color: #ff9d68;
 }
 
+.totop {
+  position: fixed !important;
+  right: 0;
+  bottom: 50px;
+  transform: translateY(-50%);
+  background: #FFA575;
+  color: #fff;
+  padding: 10px;
+  border-radius: 80px;
+  border: none;
+  cursor: pointer;
+  z-index: 1000;
+  font-size: 40px;
+  transition: transform 0.3s, font-size 0.3s;
+}
+
+
+
 /* 반응형 디자인 */
 @media (max-width: 768px) {
     .recipes-search {

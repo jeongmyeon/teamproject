@@ -1,13 +1,13 @@
 package com.project.model;
 
-import lombok.*;
+import lombok.*; 
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Recipe {
-    private Long recipesId;
+    private Integer recipesId;
     private String foodName;
     private String foodImg;
     private String step1;
@@ -28,10 +28,10 @@ public class Recipe {
     private Integer weatherId;
 
     // ✅ 해당 레시피의 재료 리스트 추가
-    private List<Ingredient> ingredients;
+    private List<Ingredients> ingredients;
 
     // ✅ 올바른 생성자 추가 (컨트롤러와 일치하도록)
-    public Recipe(Long recipesId, String foodName, int foodTime, int categoryId, Integer weatherId) {
+    public Recipe(Integer recipesId, String foodName, int foodTime, int categoryId, Integer weatherId) {
         this.recipesId = recipesId;
         this.foodName = foodName;
         this.foodTime = foodTime;
@@ -46,7 +46,7 @@ public class Recipe {
         this.weatherId = weatherId;
     }
 
-    public Recipe(Long recipesId, String foodName, int foodTime, int categoryId) {
+    public Recipe(Integer recipesId, String foodName, int foodTime, int categoryId) {
         this.recipesId = recipesId;
         this.foodName = foodName;
         this.foodTime = foodTime;

@@ -304,6 +304,7 @@ export default function List() {
                 <button className="rc-se" style={{fontFamily:"NEXON Lv1 Gothic OTF"}} onClick={ ()=>{if(!category){alert("카테고리를 선택해 주세요."); return;} handleSearch}} disabled={false}>검색</button>
             </div>
             
+            
             {isSearching && recipes.length === 0? (<p>검색 결과가 없습니다.</p>) :
             (
                 <div className="recipes-grid">
@@ -335,6 +336,7 @@ export default function List() {
                     더보기
                 </button>
             )}
+            <button onClick={scrollToTop} className="totop">🔝</button>
         </div>
     );
 }

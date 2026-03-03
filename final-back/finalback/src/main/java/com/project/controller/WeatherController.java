@@ -43,8 +43,25 @@ public class WeatherController {
     }
     
     @GetMapping("/api/weather/recipe")
-    public List<Recipes> getWeatherRecipes(@RequestParam String precipitation){
-    	List<Recipes> recipes = recipesService.getWeatherRecipes(precipitation);
+    public List<Recipes> getWeatherRecipes(@RequestParam("precipitation") String precipitation){
+    	int weatherId = 0;
+    	switch(precipitation) {
+    	case "맑음":
+    		weatherId = 0;
+    		break;
+    	case "비":
+    		weatherId = 1;
+    		break;
+    	case "흐림":
+    		weatherId = 2;
+    		break;
+    	case "눈":
+    		weatherId = 3;
+    		break;
+    	default:
+    		weatherId = 0;
+    	}
+    	List<Recipes> recipes = recipesService.getWeatherRecipes(weatherId);
     	System.out.println("요청받은 강수 형태: " + precipitation);
     	for(Recipes recipe : recipes) {
     		List<Ingredients> ingredients = recipesService.getIngredientsByRecipeId(recipe.getRecipesId());

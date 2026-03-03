@@ -4,37 +4,88 @@ package com.project.model;
 import java.util.List;
 
 import lombok.Data;
+import java.util.ArrayList;
+import jakarta.persistence.*;
 
 @Data
-public class Recipes {
-	 private Long recipesId;
-	 private String foodName;
-	 private String foodImg;
-	 private String step1;
-	 private String step2;
-	 private String step3;
-	 private String step4;
-	 private String step5;
-	 private String step6;
-	 private String stepImg1;
-	 private String stepImg2;
-	 private String stepImg3;
-	 private String stepImg4;
-	 private String stepImg5;
-	 private String stepImg6;
-	 private int view;
-	 private int foodTime;
-	 private String categoryName;
-	 private int categoryId;
-	 private String ingredientNames;
-	 private List<Ingredients> ingredients; 
-	 
-	 public List<Ingredients> getIngredients() {
-	        return ingredients;
-	    }
-
-	    public void setIngredients(List<Ingredients> ingredients) {
-	        this.ingredients = ingredients;
-	    }
-
+@Entity
+@Table(name = "Recipes")
+public class Recipes{
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "recipes_id")
+	private Integer recipesId;
+	private String foodName;
+	@Column(name = "foodImg")
+	private String foodImg;
+	
+	private String step1;
+	private String step2;
+	private String step3;
+	private String step4;
+	private String step5;
+	private String step6;
+	private String stepImg1;
+	private String stepImg2;
+	private String stepImg3;
+	private String stepImg4;
+	private String stepImg5;
+	private String stepImg6;
+	
+	private int view;
+	private int foodTime;
+	
+	@Column(name = "category_id", insertable = false, updatable = false)
+	private Integer categoryId;
+	private Integer weatherId;
+	
+	@ManyToMany
+	@JoinTable(
+			name = "Recipe_Ingredients",
+			joinColumns = @JoinColumn(name = "recipes_id"),
+			inverseJoinColumns = @JoinColumn(name = "ingredient_id")
+	)
+	private List<Ingredients> ingredients = new ArrayList<>();
+	
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "category_id")
+	private Categories category;
+	
+	public String getCategoryName() {
+		return (this.category != null) ? this.category.getCategoryName() : null;
+	}
 }
+
+//@Data
+//public class Recipes {
+//	 private Long recipesId;
+//	 private String foodName;
+//	 private String foodImg;
+//	 private String step1;
+//	 private String step2;
+//	 private String step3;
+//	 private String step4;
+//	 private String step5;
+//	 private String step6;
+//	 private String stepImg1;
+//	 private String stepImg2;
+//	 private String stepImg3;
+//	 private String stepImg4;
+//	 private String stepImg5;
+//	 private String stepImg6;
+//	 private int view;
+//	 private int foodTime;
+//	 private String categoryName;
+//	 private int categoryId;
+//	 private String ingredientNames;
+//	 private List<Ingredients> ingredients; 
+//	 
+//	 public List<Ingredients> getIngredients() {
+//	        return ingredients;
+//	    }
+//
+//	    public void setIngredients(List<Ingredients> ingredients) {
+//	        this.ingredients = ingredients;
+//	    }
+//
+//}

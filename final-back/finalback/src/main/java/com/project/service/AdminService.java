@@ -1,6 +1,6 @@
 package com.project.service;
 
-import java.util.List;
+import java.util.List; 
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.project.mapper.AdminMapper;
-import com.project.model.Ingredient;
+import com.project.model.Ingredients;
 import com.project.model.Inquiry;
 import com.project.model.Recipe;
 import com.project.model.User;
@@ -109,21 +109,21 @@ public class AdminService {
     }
 
     /** ✅ 2. 특정 레시피 조회 */
-    public Recipe getRecipeById(Long recipeId) {
+    public Recipe getRecipeById(Integer recipeId) {
         Recipe recipe = adminMapper.getRecipeById(recipeId);
         if (recipe == null) {
             throw new RuntimeException("❌ 해당 레시피가 존재하지 않습니다.");
         }
 
         // ✅ 해당 레시피의 재료도 함께 조회
-        List<Ingredient> ingredients = adminMapper.getIngredientsByRecipeId(recipeId);
+        List<Ingredients> ingredients = adminMapper.getIngredientsByRecipeId(recipeId);
         recipe.setIngredients(ingredients);
         System.out.println("✅ 가져온 재료: " + recipe.getIngredients());
         return recipe;
     }
 
     /** ✅ 3. 특정 레시피의 재료 목록 조회 */
-    public List<Ingredient> getIngredientsByRecipeId(Long recipeId) {
+    public List<Ingredients> getIngredientsByRecipeId(Integer recipeId) {
         return adminMapper.getIngredientsByRecipeId(recipeId);
     }
 
@@ -158,7 +158,7 @@ public class AdminService {
             	    Integer ingredientId = adminMapper.getIngredientIdByName(ingredientName);
 
             	    if (ingredientId == null) {
-            	        Ingredient newIngredient = new Ingredient();
+            	        Ingredients newIngredient = new Ingredients();
             	        newIngredient.setName(ingredientName);
 
             	        adminMapper.insertNewIngredient(newIngredient); // ✅ 객체 전달
@@ -175,7 +175,7 @@ public class AdminService {
 
     /** ✅ 5. 기존 재료 삭제 후 새로운 재료 추가 */
     /** ✅ 재료를 추가하는 메서드 */
-    private void insertIngredients(Long recipeId, List<String> ingredients) {
+    private void insertIngredients(Integer recipeId, List<String> ingredients) {
         if (ingredients == null || ingredients.isEmpty()) {
             System.out.println("⚠️ 추가할 재료 없음.");
             return;
@@ -187,7 +187,7 @@ public class AdminService {
 
             // ✅ 2. 존재하지 않으면 새로운 재료 추가
             if (ingredientId == null) {
-                Ingredient newIngredient = new Ingredient(); // 객체 생성
+                Ingredients newIngredient = new Ingredients(); // 객체 생성
                 newIngredient.setName(ingredientName);
 
                 adminMapper.insertNewIngredient(newIngredient); // ✅ 객체 전달
@@ -238,10 +238,18 @@ public class AdminService {
 
         // ✅ DB 업데이트 실행
         adminMapper.updateRecipe(recipe);
+        
+        updateRecipeIngredients(recipe.getRecipesId(), ingredients);
+   }
 
         // ✅ 재료 업데이트
-        updateRecipeIngredients(recipe.getRecipesId(), ingredients);
-    }
+   		private void updateRecipeIngredients(Integer recipeId, List<String> ingredients) {
+        	adminMapper.deleteIngredientsByRecipeId(recipeId);
+        	
+        	if(ingredients !=null && !ingredients.isEmpty()) {	
+        	insertIngredients(recipeId,ingredients);
+        	}
+   		}
 
     private String handleStepImage(MultipartFile newFile, String existingFile, boolean deleteFlag) {
         if (deleteFlag) {
@@ -254,7 +262,7 @@ public class AdminService {
             return existingFile;
         }
     }
-    public void deleteStepImage(Long recipeId, int stepNumber) {
+    public void deleteStepImage(Integer recipeId, int stepNumber) {
         if (stepNumber < 1) {  
             throw new IllegalArgumentException("❌ 단계 번호는 1 이상이어야 합니다. stepNumber: " + stepNumber);
         }
@@ -282,11 +290,6 @@ public class AdminService {
         if (fileName != null && !fileName.isEmpty()) {
             fileStorageService.deleteFile(fileName);
         }
-    }
-    /** ✅ 기존 재료 삭제 후 새로운 재료 추가 */
-    private void updateRecipeIngredients(Long recipeId, List<String> ingredients) {
-        adminMapper.deleteIngredientsByRecipeId(recipeId); // 기존 재료 삭제
-        insertIngredients(recipeId, ingredients); // 새로운 재료 추가
     }
     /** ✅ 레시피 단계별 설명 업데이트 */
     private void setRecipeSteps(Recipe recipe, String step1, String step2, String step3, String step4, String step5, String step6) {
@@ -347,7 +350,7 @@ public class AdminService {
     }
 
     /** ✅ 5. 레시피 삭제 */
-    public void deleteRecipe(Long id) {
+    public void deleteRecipe(Integer id) {
         adminMapper.deleteRecipe(id);
     }
     /** ✅ 유저 레시피 (User_Recipes) 관리 **/

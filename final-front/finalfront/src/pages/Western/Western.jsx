@@ -25,6 +25,10 @@ export default function Western(){
     const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
     recognition.lang = 'ko-KR'; 
 
+    const scrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      };
+
     useEffect(() => {
         const token = localStorage.getItem('token');
         setToken(token);
@@ -327,6 +331,7 @@ export default function Western(){
                     더보기
                 </button>
             )}
+             <button onClick={scrollToTop} className="totop">🔝</button>
         </div>
     );
 }

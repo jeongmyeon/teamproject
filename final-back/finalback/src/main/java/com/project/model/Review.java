@@ -1,13 +1,13 @@
 package com.project.model;
 
-import java.time.LocalDateTime;
+import java.time.LocalDateTime; 
 
 import lombok.Data;
 
 @Data
 public class Review {
 	private long reviewId;
-	private long recipesId;
+	private Integer recipesId;
 	private long usersId;
 	private long userRecipesId;
 	private String reviewText;

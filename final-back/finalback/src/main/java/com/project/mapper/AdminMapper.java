@@ -1,6 +1,6 @@
 package com.project.mapper;
 
-import java.util.List;
+import java.util.List; 
 
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
@@ -13,7 +13,7 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import com.project.config.StringToListTypeHandler;
-import com.project.model.Ingredient;
+import com.project.model.Ingredients;
 import com.project.model.Inquiry;
 import com.project.model.Recipe;
 import com.project.model.User;
@@ -122,14 +122,14 @@ public interface AdminMapper {
         @Result(property = "step6", column = "step6"),
         @Result(property = "ingredients", column = "ingredients", typeHandler = StringToListTypeHandler.class)
     })
-    Recipe getRecipeById(@Param("recipeId") Long recipeId);
+    Recipe getRecipeById(@Param("recipeId") Integer recipeId);
 
    
     /** ✅ 3. 특정 레시피의 재료 목록 조회 */
     @Select("SELECT i.ingredient_id, i.name FROM Ingredients i " +
             "JOIN Recipe_Ingredients ri ON ri.ingredient_id = i.ingredient_id " +
             "WHERE ri.recipes_id = #{recipeId}")
-    List<Ingredient> getIngredientsByRecipeId(@Param("recipeId") Long recipeId);
+    List<Ingredients> getIngredientsByRecipeId(@Param("recipeId") Integer recipeId);
     
     /** ✅ 4. 레시피 추가 */
     @Insert("INSERT INTO Recipes (foodName, foodImg, step1, step2, step3, step4, step5, step6, " +
@@ -141,11 +141,11 @@ public interface AdminMapper {
 
     /** ✅ 기존 레시피의 모든 재료 삭제 */
     @Delete("DELETE FROM Recipe_Ingredients WHERE recipes_id = #{recipeId}")
-    void deleteIngredientsByRecipeId(@Param("recipeId") Long recipeId);
+    void deleteIngredientsByRecipeId(@Param("recipeId") Integer recipeId);
 
     /** ✅ 재료 추가 (Recipe_Ingredients 테이블) */
     @Insert("INSERT INTO Recipe_Ingredients (recipes_id, ingredient_id) VALUES (#{recipeId}, #{ingredientId})")
-    void insertRecipeIngredient(@Param("recipeId") Long recipeId, @Param("ingredientId") Integer ingredientId);
+    void insertRecipeIngredient(@Param("recipeId") Integer recipeId, @Param("ingredientId") Integer ingredientId);
 
     /** ✅ 특정 재료 ID 조회 */
     @Select("SELECT ingredient_id FROM Ingredients WHERE name = #{name}")
@@ -154,7 +154,7 @@ public interface AdminMapper {
     /** ✅ 새 재료 추가 */
     @Insert("INSERT INTO Ingredients (name) VALUES (#{name})")
     @Options(useGeneratedKeys = true, keyProperty = "ingredientId", keyColumn = "ingredient_id") // 🔥 Integer 타입으로 변경
-    void insertNewIngredient(Ingredient ingredient);
+    void insertNewIngredient(Ingredients ingredient);
 
     /** ✅ 9. 레시피 업데이트 */
     @Update("UPDATE Recipes SET foodName = #{foodName}, foodImg = #{foodImg}, " +
@@ -168,16 +168,16 @@ public interface AdminMapper {
     int updateRecipe(Recipe recipe);
     // ✅ 특정 레시피 단계별 이미지 경로 조회
     @Select("SELECT ${column} FROM recipes WHERE recipes_id = #{recipeId}")
-    String getStepImagePath(@Param("recipeId") Long recipeId, @Param("column") String column);
+    String getStepImagePath(@Param("recipeId") Integer recipeId, @Param("column") String column);
 
     // ✅ 특정 단계 이미지 삭제
     @Update("UPDATE recipes SET ${column} = NULL WHERE recipes_id = #{recipeId}")
-    void deleteStepImage(@Param("recipeId") Long recipeId, @Param("column") String column);
+    void deleteStepImage(@Param("recipeId") Integer recipeId, @Param("column") String column);
 
 
     /** ✅ 10. 레시피 삭제 */
     @Delete("DELETE FROM Recipes WHERE recipes_id = #{recipeId}")
-    void deleteRecipe(@Param("recipeId") Long recipeId);
+    void deleteRecipe(@Param("recipeId") Integer recipeId);
     /** ✅ 레시피 검색 (이름, 카테고리, 날씨 필터링 포함) */
 
         /** ✅ 검색 기능 포함된 레시피 조회 */

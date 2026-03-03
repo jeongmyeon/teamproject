@@ -1,0 +1,28 @@
+package com.project.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+import com.project.model.Recipes;
+
+import java.util.List;
+
+@Repository
+public interface RecipesRepository extends JpaRepository<Recipes, Long> {
+	// 1. 전체 조회
+	@Query("SELECT DISTINCT r FROM Recipes r LEFT JOIN FETCH r.ingredients")
+	List<Recipes> findAllWithIngredients();
+	
+	// 2. 음식명 검색
+	List<Recipes> findByFoodNameContaining(String query);
+	
+	// 3. 인기 레시피
+	List<Recipes> findTop10ByOrderByViewDesc();
+	
+	// 4. 재료명 검색
+	List<Recipes> findByIngredientsNameContaining(String query);
+	
+	// 5. 날씨 기반 추천
+	List<Recipes> findByWeatherId(int weatrherId);
+}

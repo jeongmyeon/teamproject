@@ -1,0 +1,16 @@
+package com.project.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+import com.project.model.Recipes;
+
+import java.util.List;
+
+@Repository
+public interface RecipesRepository extends JpaRepository<Recipes, Long> {
+	@Query("SELECT DISTINCT r FROM Recipes r LEFT JOIN FETCH r.ingredients")
+	List<Recipes> findAllWithIngredients();
+	List<Recipes> findByFoodNameContaining(String query);
+}

@@ -33,13 +33,13 @@ public interface RecipesMapper {
     List<Recipes> findByFoodName(@Param("query") String query);
 
     @Select("SELECT i.* FROM Ingredients i JOIN Recipe_Ingredients ri ON i.ingredient_id = ri.ingredient_id WHERE ri.recipes_id = #{recipesId}")
-    List<Ingredients> findIngredientsByRecipeId(@Param("recipesId") Long recipesId);
+    List<Ingredients> findIngredientsByRecipeId(@Param("recipesId") Integer recipesId);
 
     @Update("UPDATE Recipes SET view = view + 1 WHERE recipes_id = #{recipesId}")
     void incrementViewCount(@Param("recipesId") Long recipesId);
 
     @Insert("INSERT INTO favorite (recipe_id,user_id) VALUES (#{recipesId},#{userId})")
-    void addFavoriteList(@Param("recipesId") Long recipesId, @Param("userId") Long userId);
+    void addFavoriteList(@Param("recipesId") Integer recipesId, @Param("userId") Long userId);
 
     @Delete("DELETE FROM favorite WHERE user_id = #{userId} AND recipe_id = #{recipeId}")
     void deleteFavoriteList(@Param("userId") long userId, @Param("recipeId") long recipeId);
